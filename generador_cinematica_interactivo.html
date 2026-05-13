@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generador de Problemas de Cinemática | Física General</title>
+  <style>
+    :root{
+      --navy:#0b1f3a;
+      --blue:#123b6d;
+      --red:#b51f2a;
+      --yellow:#f2c94c;
+      --white:#ffffff;
+      --bg:#f5f7fb;
+      --ink:#172033;
+      --muted:#667085;
+      --line:#d9e2ec;
+      --ok:#197a4a;
+      --bad:#b42318;
+      --soft-blue:#eaf1fb;
+      --soft-red:#fdecee;
+      --soft-yellow:#fff7dd;
+      --card:#ffffff;
+      --shadow:0 12px 30px rgba(11,31,58,.12);
+      --radius:22px;
+    }
+
+    *{ box-sizing:border-box; }
+    html{ scroll-behavior:smooth; }
+    body{
+      margin:0;
+      font-family:"Century Gothic","Aptos","Segoe UI",Arial,sans-serif;
+      background:linear-gradient(180deg,#f8fbff 0%,#eef3fb 100%);
+      color:var(--ink);
+    }
+
+    header{
+      background:var(--navy);
+      color:white;
+      padding:24px clamp(18px,4vw,48px);
+      position:relative;
+      overflow:hidden;
+    }
+    header:before{
+      content:"";
+      position:absolute;
+      width:280px;
+      height:280px;
+      border-radius:50%;
+      right:-90px;
+      top:-120px;
+      background:rgba(242,201,76,.22);
+    }
+    header:after{
+      content:"";
+      position:absolute;
+      width:220px;
+      height:220px;
+      border-radius:50%;
+      right:120px;
+      bottom:-160px;
+      background:rgba(181,31,42,.18);
+    }
+    .hero{ position:relative; z-index:2; display:flex; gap:22px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .brand{ display:flex; gap:16px; align-items:center; }
+    .logo{
+      width:64px; height:64px; border-radius:18px; background:#fff; color:var(--navy);
+      display:grid; place-items:center; font-weight:900; font-size:22px;
+      box-shadow:0 8px 20px rgba(0,0,0,.18);
+    }
+    h1{ margin:0 0 6px; font-size:clamp(25px,3.5vw,44px); line-height:1.05; letter-spacing:-.03em; }
+    .subtitle{ margin:0; color:#d9e8ff; font-size:clamp(14px,1.7vw,18px); max-width:930px; }
+    .pill-row{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .pill{ border:1px solid rgba(255,255,255,.28); padding:7px 11px; border-radius:999px; color:#f7fbff; background:rgba(255,255,255,.08); font-size:13px; }
+
+    main{ width:min(1420px,96vw); margin:26px auto 54px; display:grid; grid-template-columns:380px 1fr; gap:24px; }
+    @media(max-width:1000px){ main{ grid-template-columns:1fr; } }
+
+    .panel, .quiz-card, .tool-card{
+      background:var(--card);
+      border:1px solid rgba(11,31,58,.08);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .panel{ padding:22px; position:sticky; top:16px; align-self:start; }
+    @media(max-width:1000px){ .panel{ position:static; } }
+    .panel h2, .quiz-card h2, .tool-card h2{ margin:0 0 14px; color:var(--navy); font-size:22px; }
+    label{ font-weight:700; color:var(--navy); display:block; margin:13px 0 6px; }
+    input, select, textarea{
+      width:100%; border:1px solid var(--line); border-radius:14px; padding:11px 12px;
+      font-family:inherit; font-size:15px; background:#fff; color:var(--ink);
+      outline:none;
+    }
+    input:focus, select:focus, textarea:focus{ border-color:#5b82bd; box-shadow:0 0 0 4px rgba(18,59,109,.12); }
+    .row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .check-grid{ display:grid; grid-template-columns:1fr; gap:8px; margin:8px 0 4px; }
+    .check{
+      display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--line);
+      border-radius:15px; background:#fbfdff; cursor:pointer; font-weight:600; color:#24334d;
+    }
+    .check input{ width:auto; accent-color:var(--blue); }
+    .hint-note{ color:var(--muted); font-size:13px; line-height:1.35; margin:8px 0 0; }
+
+    button{
+      border:0; border-radius:16px; padding:11px 14px; font-family:inherit; font-weight:800;
+      cursor:pointer; transition:.16s transform,.16s opacity,.16s box-shadow; font-size:14px;
+    }
+    button:hover{ transform:translateY(-1px); }
+    button:disabled{ cursor:not-allowed; opacity:.45; transform:none; }
+    .btn-primary{ background:var(--red); color:white; box-shadow:0 8px 18px rgba(181,31,42,.22); }
+    .btn-secondary{ background:var(--navy); color:white; }
+    .btn-soft{ background:var(--soft-blue); color:var(--navy); border:1px solid #c8d8ee; }
+    .btn-yellow{ background:var(--yellow); color:var(--navy); }
+    .btn-ghost{ background:#fff; color:var(--navy); border:1px solid var(--line); }
+    .btn-row{ display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
+
+    .content{ display:flex; flex-direction:column; gap:22px; }
+    .quiz-card{ padding:24px; min-height:450px; }
+    .topbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:16px; }
+    .progress-wrap{ flex:1; min-width:240px; }
+    .progress-label{ display:flex; justify-content:space-between; font-size:13px; color:var(--muted); margin-bottom:6px; font-weight:700; }
+    .progress{ height:12px; background:#e8eef7; border-radius:999px; overflow:hidden; }
+    .progress span{ display:block; height:100%; width:0%; background:var(--red); border-radius:999px; transition:.25s width; }
+    .scorebox{ display:flex; gap:8px; flex-wrap:wrap; }
+    .score-chip{ padding:8px 10px; border-radius:999px; background:var(--soft-yellow); color:var(--navy); font-size:13px; font-weight:800; border:1px solid #f4dc83; }
+
+    .problem-meta{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 15px; }
+    .tag{ padding:7px 10px; border-radius:999px; font-size:12px; font-weight:900; letter-spacing:.02em; }
+    .tag-topic{ background:var(--soft-blue); color:var(--navy); }
+    .tag-level{ background:var(--soft-yellow); color:#5b4300; }
+    .tag-mode{ background:var(--soft-red); color:var(--red); }
+
+    .question{ font-size:20px; line-height:1.45; font-weight:800; color:#172033; margin:8px 0 18px; }
+    .formula-card{
+      border:1px dashed #a9bfdc; background:#f8fbff; border-radius:17px; padding:12px 14px; margin:12px 0;
+      color:#21314d; font-weight:700;
+    }
+    .choices{ display:grid; gap:11px; margin:16px 0; }
+    .choice{
+      display:flex; gap:12px; align-items:flex-start; padding:14px; border-radius:18px; border:2px solid #e3e9f2;
+      background:#fff; cursor:pointer; transition:.16s border,.16s background,.16s transform;
+    }
+    .choice:hover{ border-color:#9bb5d6; transform:translateY(-1px); }
+    .choice.selected{ border-color:var(--blue); background:#eef5ff; }
+    .choice.correct{ border-color:var(--ok); background:#eaf7ef; }
+    .choice.wrong{ border-color:var(--bad); background:#fff1f0; }
+    .choice-letter{
+      width:30px; height:30px; border-radius:50%; display:grid; place-items:center; flex:0 0 30px;
+      background:var(--navy); color:white; font-weight:900;
+    }
+    .choice-text{ line-height:1.35; padding-top:4px; font-weight:700; }
+    .feedback{ margin:14px 0 0; padding:13px 14px; border-radius:16px; font-weight:700; display:none; }
+    .feedback.ok{ display:block; background:#eaf7ef; color:#0a5c36; border:1px solid #a9dec2; }
+    .feedback.bad{ display:block; background:#fff1f0; color:#912018; border:1px solid #f7b5ad; }
+
+    .hint-box, .solution-box{
+      display:none; margin:14px 0 0; padding:16px; border-radius:18px; line-height:1.55;
+    }
+    .hint-box{ background:#fff9e7; border:1px solid #f2d370; }
+    .solution-box{ background:#f6f8fb; border:1px solid #ccd8e7; }
+    .solution-box h3, .hint-box h3{ margin:0 0 8px; color:var(--navy); }
+    .solution-box ol{ margin:8px 0 0 22px; padding:0; }
+    .solution-box li{ margin:5px 0; }
+    .math{ font-family:"Cambria Math","Times New Roman",serif; font-size:1.05em; }
+
+    .svg-wrap{ margin:12px 0; border:1px solid #dde7f2; border-radius:18px; padding:12px; background:#fff; overflow:auto; }
+    svg{ max-width:100%; height:auto; }
+    .axis{ stroke:#172033; stroke-width:2; }
+    .gridline{ stroke:#d9e2ec; stroke-width:1; }
+    .curve{ stroke:#b51f2a; stroke-width:4; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+    .area{ fill:rgba(18,59,109,.12); stroke:none; }
+    .dot{ fill:#123b6d; }
+    .svg-label{ font-size:13px; fill:#172033; font-weight:700; }
+
+    .empty-state{ text-align:center; padding:50px 16px; }
+    .empty-icon{ width:92px; height:92px; border-radius:28px; background:var(--soft-blue); display:grid; place-items:center; margin:0 auto 18px; color:var(--navy); font-size:44px; }
+    .empty-state h2{ font-size:30px; margin-bottom:8px; }
+    .empty-state p{ color:var(--muted); max-width:760px; margin:0 auto 18px; line-height:1.5; }
+
+    .result-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:13px; margin:16px 0; }
+    @media(max-width:720px){ .result-grid{ grid-template-columns:1fr; } }
+    .result-card{ border:1px solid var(--line); border-radius:18px; padding:16px; background:#fbfdff; }
+    .result-card .big{ font-size:34px; color:var(--navy); font-weight:900; line-height:1; }
+    .result-card .small{ font-size:13px; color:var(--muted); margin-top:6px; font-weight:700; }
+    .review-list{ display:grid; gap:10px; margin-top:14px; }
+    .review-item{ border:1px solid var(--line); border-radius:16px; padding:12px; background:#fff; }
+    .review-item strong{ color:var(--navy); }
+    .mini-ok{ color:var(--ok); font-weight:900; }
+    .mini-bad{ color:var(--bad); font-weight:900; }
+
+    .tool-card{ padding:22px; }
+    .tabs{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+    .tab{ background:#fff; border:1px solid var(--line); color:var(--navy); }
+    .tab.active{ background:var(--navy); color:#fff; }
+    .calc-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    @media(max-width:900px){ .calc-grid{ grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:560px){ .calc-grid{ grid-template-columns:1fr; } }
+    .calc-output{ margin-top:14px; padding:14px; border-radius:18px; background:#f8fbff; border:1px solid #ccdae9; font-weight:800; color:var(--navy); line-height:1.55; }
+    .small-title{ margin:0 0 8px; font-size:15px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; }
+
+    footer{ width:min(1420px,96vw); margin:0 auto 30px; color:#64748b; font-size:13px; line-height:1.4; text-align:center; }
+
+    @media print{
+      body{ background:#fff; }
+      header, .panel, .tool-card, .btn-row, .tabs{ display:none !important; }
+      main{ display:block; width:100%; margin:0; }
+      .quiz-card{ box-shadow:none; border:0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <div class="brand">
+        <div class="logo">FG</div>
+        <div>
+          <h1>Generador de problemas de Cinemática</h1>
+          <p class="subtitle">MRU · MRUV · Caída libre · Tiro vertical · Análisis de gráficas · Práctica con pistas y evaluación con nota final.</p>
+          <div class="pill-row">
+            <span class="pill">Selección múltiple</span>
+            <span class="pill">Datos aleatorios</span>
+            <span class="pill">Pistas progresivas</span>
+            <span class="pill">Solución completa</span>
+            <span class="pill">Reporte para Teams</span>
+          </div>
+        </div>
+      </div>
+      <div class="pill-row">
+        <span class="pill">g = 9.8 m/s²</span>
+        <span class="pill">Respuestas a 2 decimales</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <aside class="panel" aria-label="Configuración del generador">
+      <h2>Configurar práctica</h2>
+
+      <label for="studentName">Nombre del estudiante</label>
+      <input id="studentName" type="text" placeholder="Ej. Ana Pérez" />
+
+      <label for="studentSection">Grado / sección</label>
+      <input id="studentSection" type="text" placeholder="Ej. 4.º Bachillerato A" />
+
+      <div class="row">
+        <div>
+          <label for="numProblems">Cantidad</label>
+          <select id="numProblems">
+            <option value="5">5 problemas</option>
+            <option value="10" selected>10 problemas</option>
+            <option value="15">15 problemas</option>
+            <option value="20">20 problemas</option>
+            <option value="25">25 problemas</option>
+            <option value="30">30 problemas</option>
+          </select>
+        </div>
+        <div>
+          <label for="difficulty">Nivel</label>
+          <select id="difficulty">
+            <option value="basic">Básico</option>
+            <option value="intermediate" selected>Intermedio</option>
+            <option value="advanced">Avanzado</option>
+            <option value="mixed">Mixto</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="mode">Modo</label>
+          <select id="mode">
+            <option value="practice" selected>Práctica</option>
+            <option value="exam">Evaluación</option>
+          </select>
+        </div>
+        <div>
+          <label for="seedInput">Semilla</label>
+          <input id="seedInput" type="text" placeholder="Automática" />
+        </div>
+      </div>
+
+      <label>Temas</label>
+      <div class="check-grid">
+        <label class="check"><input type="checkbox" class="topic" value="mru" checked /> MRU</label>
+        <label class="check"><input type="checkbox" class="topic" value="mruv" checked /> MRUV</label>
+        <label class="check"><input type="checkbox" class="topic" value="freefall" checked /> Caída libre</label>
+        <label class="check"><input type="checkbox" class="topic" value="vertical" checked /> Tiro vertical</label>
+        <label class="check"><input type="checkbox" class="topic" value="graphs" checked /> Análisis de gráficas</label>
+      </div>
+      <p class="hint-note">En modo evaluación se ocultan las soluciones hasta terminar. En práctica, el estudiante puede usar pistas y ver solución completa.</p>
+
+      <div class="btn-row">
+        <button class="btn-primary" id="startBtn">Generar test</button>
+        <button class="btn-soft" id="shareBtn">Copiar enlace configurado</button>
+        <button class="btn-ghost" id="resetBtn">Reiniciar</button>
+      </div>
+      <p class="hint-note" id="shareStatus"></p>
+    </aside>
+
+    <section class="content">
+      <section class="quiz-card" id="quizArea">
+        <div class="empty-state">
+          <div class="empty-icon">Σ</div>
+          <h2>Listo para practicar cinemática</h2>
+          <p>Elige cantidad de problemas, nivel, temas y modo. Cada estudiante obtendrá datos y opciones distintas. Al finalizar se genera nota, porcentaje, revisión y reporte listo para entregar.</p>
+          <button class="btn-primary" onclick="startQuiz()">Comenzar ahora</button>
+        </div>
+      </section>
+
+      <section class="tool-card">
+        <h2>Laboratorio rápido de fórmulas</h2>
+        <p class="hint-note">Herramienta opcional para explorar relaciones. No resuelve el test automáticamente, pero ayuda a verificar ideas.</p>
+        <div class="tabs">
+          <button class="tab active" data-tab="mruCalc">MRU</button>
+          <button class="tab" data-tab="mruvCalc">MRUV</button>
+          <button class="tab" data-tab="fallCalc">Caída libre</button>
+          <button class="tab" data-tab="verticalCalc">Tiro vertical</button>
+        </div>
+        <div id="calcPanel"></div>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    Generador educativo de práctica. Los resultados se guardan localmente en el navegador del estudiante; para entrega formal, usar captura, impresión PDF o reporte copiado en Teams.
+  </footer>
+
+  <script>
+    const G = 9.8;
+    const app = {
+      rng: Math.random,
+      seed: "",
+      problems: [],
+      index: 0,
+      answers: [],
+      startedAt: null,
+      mode: "practice",
+      hintShown: 0,
+      checked: false,
+      selected: null,
+      calcTab: "mruCalc"
+    };
+
+    const topicNames = {
+      mru:"MRU",
+      mruv:"MRUV",
+      freefall:"Caída libre",
+      vertical:"Tiro vertical",
+      graphs:"Análisis de gráficas"
+    };
+
+    const levelNames = {
+      basic:"Básico",
+      intermediate:"Intermedio",
+      advanced:"Avanzado",
+      mixed:"Mixto"
+    };
+
+    function xmur3(str){
+      let h = 1779033703 ^ str.length;
+      for(let i=0;i<str.length;i++){
+        h = Math.imul(h ^ str.charCodeAt(i),3432918353);
+        h = h << 13 | h >>> 19;
+      }
+      return function(){
+        h = Math.imul(h ^ h >>> 16,2246822507);
+        h = Math.imul(h ^ h >>> 13,3266489909);
+        return (h ^= h >>> 16) >>> 0;
+      }
+    }
+    function mulberry32(a){
+      return function(){
+        let t = a += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      }
+    }
+    function setSeed(seed){
+      app.seed = seed || ("CIN-" + Date.now() + "-" + Math.floor(Math.random()*999999));
+      const seedFn = xmur3(app.seed);
+      app.rng = mulberry32(seedFn());
+    }
+    function rand(min,max){ return min + (max-min)*app.rng(); }
+    function randInt(min,max){ return Math.floor(rand(min,max+1)); }
+    function pick(arr){ return arr[Math.floor(app.rng()*arr.length)]; }
+    function shuffle(arr){
+      const a = [...arr];
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(app.rng()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
+      }
+      return a;
+    }
+    function round2(x){ return Math.round((x + Number.EPSILON)*100)/100; }
+    function fmt(x){
+      if(!Number.isFinite(x)) return "—";
+      return round2(x).toFixed(2);
+    }
+    function fmtSmart(x){
+      if(!Number.isFinite(x)) return "—";
+      if(Math.abs(x) >= 1000) return round2(x).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+      return fmt(x);
+    }
+    function unitText(value, unit){ return `${fmtSmart(value)} ${unit}`; }
+    function uniqueNumbers(values){
+      const out=[];
+      values.forEach(v=>{
+        if(Number.isFinite(v) && !out.some(x=>Math.abs(round2(x)-round2(v))<0.01)) out.push(v);
+      });
+      return out;
+    }
+    function makeChoices(correct, unit, distractors=[]){
+      const base = [correct, ...distractors];
+      let vals = uniqueNumbers(base);
+      const scale = Math.max(1, Math.abs(correct));
+      const factors = [0.5,0.75,1.25,1.5,2,-1];
+      let k=0;
+      while(vals.length<4 && k<20){
+        const factor = factors[k%factors.length];
+        const noise = (k%3===0 ? rand(-0.12,0.12)*scale : 0);
+        const candidate = correct*factor + noise;
+        if(candidate !== correct && Number.isFinite(candidate)) vals = uniqueNumbers([...vals,candidate]);
+        k++;
+      }
+      vals = vals.slice(0,4);
+      return shuffle(vals.map(v=>({ text: unitText(v,unit), value: round2(v), correct: Math.abs(round2(v)-round2(correct))<0.01 })));
+    }
+    function makeTextChoices(correctText, wrongTexts){
+      return shuffle([correctText, ...wrongTexts].slice(0,4).map(t=>({text:t, correct:t===correctText})));
+    }
+    function signPlus(x){ return x>=0 ? `+ ${fmt(Math.abs(x))}` : `- ${fmt(Math.abs(x))}`; }
+
+    function renderGraph(graph){
+      if(!graph) return "";
+      const W=640,H=320, ml=62, mr=30, mt=28, mb=52;
+      const xs = graph.points.map(p=>p.x), ys = graph.points.map(p=>p.y);
+      const xmin = Math.min(0,...xs), xmax = Math.max(...xs);
+      const ymin = Math.min(0,...ys), ymax = Math.max(...ys);
+      const dx = xmax-xmin || 1, dy = ymax-ymin || 1;
+      const xPad = dx*0.08, yPad=dy*0.12;
+      const X0=xmin-xPad, X1=xmax+xPad, Y0=ymin-yPad, Y1=ymax+yPad;
+      const sx = x => ml + (x-X0)/(X1-X0)*(W-ml-mr);
+      const sy = y => H-mb - (y-Y0)/(Y1-Y0)*(H-mt-mb);
+      const xAxisY = sy(0), yAxisX = sx(0);
+      let grid="";
+      for(let i=0;i<=5;i++){
+        const x = X0 + (X1-X0)*i/5;
+        const px = sx(x);
+        grid += `<line class="gridline" x1="${px}" y1="${mt}" x2="${px}" y2="${H-mb}"/>`;
+        grid += `<text class="svg-label" x="${px-12}" y="${H-mb+25}">${fmtSmart(x)}</text>`;
+      }
+      for(let i=0;i<=4;i++){
+        const y = Y0 + (Y1-Y0)*i/4;
+        const py = sy(y);
+        grid += `<line class="gridline" x1="${ml}" y1="${py}" x2="${W-mr}" y2="${py}"/>`;
+        grid += `<text class="svg-label" x="10" y="${py+4}">${fmtSmart(y)}</text>`;
+      }
+      const path = graph.points.map((p,i)=>`${i===0?"M":"L"} ${sx(p.x)} ${sy(p.y)}`).join(" ");
+      let area = "";
+      if(graph.area){
+        const pts = graph.points.map(p=>`${sx(p.x)},${sy(p.y)}`).join(" ");
+        const last = graph.points[graph.points.length-1], first = graph.points[0];
+        area = `<polygon class="area" points="${sx(first.x)},${sy(0)} ${pts} ${sx(last.x)},${sy(0)}"/>`;
+      }
+      const dots = graph.points.map(p=>`<circle class="dot" cx="${sx(p.x)}" cy="${sy(p.y)}" r="4"/>`).join("");
+      return `<div class="svg-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${graph.title}">
+        ${grid}
+        ${area}
+        <line class="axis" x1="${ml}" y1="${xAxisY}" x2="${W-mr}" y2="${xAxisY}"/>
+        <line class="axis" x1="${yAxisX}" y1="${mt}" x2="${yAxisX}" y2="${H-mb}"/>
+        <path class="curve" d="${path}"/>
+        ${dots}
+        <text class="svg-label" x="${W/2-80}" y="22">${graph.title}</text>
+        <text class="svg-label" x="${W/2-45}" y="${H-12}">${graph.xLabel}</text>
+        <text class="svg-label" x="12" y="22">${graph.yLabel}</text>
+      </svg></div>`;
+    }
+
+    const templates = [
+      {
+        id:"mru_distance", topic:"mru", level:"basic",
+        create(){
+          const v = randInt(6,28), t = randInt(8,45), d = v*t;
+          return problem({
+            topic:"mru", level:"basic",
+            question:`Un patinador se mueve con rapidez constante de ${v} m/s durante ${t} s. ¿Qué distancia recorre?`,
+            formula:"MRU: d = v·t",
+            choices:makeChoices(d,"m",[v+t, Math.abs(v-t), d/2, d*1.1]),
+            hints:["En MRU la velocidad es constante.","Multiplica rapidez por tiempo: d = v·t.",`Usa d = (${v} m/s)(${t} s).`],
+            solution:[`Datos: v = ${v} m/s, t = ${t} s.`,`Ecuación: d = v·t.`,`Sustitución: d = (${v} m/s)(${t} s) = ${fmt(d)} m.`,`Respuesta: ${fmt(d)} m.`],
+            correct:d, unit:"m"
+          });
+        }
+      },
+      {
+        id:"mru_time", topic:"mru", level:"basic",
+        create(){
+          const v = randInt(5,22), t = randInt(6,35), d = v*t;
+          return problem({
+            topic:"mru", level:"basic",
+            question:`Un ciclista recorre ${d} m con rapidez constante de ${v} m/s. ¿Cuánto tiempo tarda?`,
+            formula:"MRU: t = d/v",
+            choices:makeChoices(t,"s",[d*v, d+v, Math.abs(d-v), t/2]),
+            hints:["Despeja el tiempo desde d = v·t.","Tiempo es distancia dividida entre rapidez.",`Calcula t = ${d} m / ${v} m/s.`],
+            solution:[`Datos: d = ${d} m, v = ${v} m/s.`,`Ecuación: t = d/v.`,`Sustitución: t = (${d} m)/(${v} m/s) = ${fmt(t)} s.`,`Respuesta: ${fmt(t)} s.`],
+            correct:t, unit:"s"
+          });
+        }
+      },
+      {
+        id:"mru_meet", topic:"mru", level:"intermediate",
+        create(){
+          const D = randInt(80,260), v1 = randInt(35,80), v2 = randInt(30,75);
+          const t = D/(v1+v2);
+          return problem({
+            topic:"mru", level:"intermediate",
+            question:`Dos vehículos parten al mismo tiempo desde ciudades separadas ${D} km y se dirigen uno hacia el otro. El primero viaja a ${v1} km/h y el segundo a ${v2} km/h. ¿En cuánto tiempo se encuentran?`,
+            formula:"Encuentro: t = D/(v₁ + v₂)",
+            choices:makeChoices(t,"h",[D/(v1-v2||1), D/v1, D/v2, (v1+v2)/D]),
+            hints:["Como van uno hacia el otro, las rapideces se suman.","La rapidez relativa es v₁ + v₂.",`t = ${D} km / (${v1} + ${v2}) km/h.`],
+            solution:[`Datos: D = ${D} km, v₁ = ${v1} km/h, v₂ = ${v2} km/h.`,`Rapidez relativa: vᵣ = v₁ + v₂ = ${v1+v2} km/h.`,`Tiempo: t = D/vᵣ = (${D} km)/(${v1+v2} km/h) = ${fmt(t)} h.`,`Respuesta: ${fmt(t)} h.`],
+            correct:t, unit:"h"
+          });
+        }
+      },
+      {
+        id:"mru_chase", topic:"mru", level:"advanced",
+        create(){
+          const d0 = randInt(80,260), slow = randInt(12,22), fast = slow + randInt(4,12);
+          const t = d0/(fast-slow);
+          return problem({
+            topic:"mru", level:"advanced",
+            question:`Un corredor B tiene ${d0} m de ventaja y corre a ${slow} m/s. Un corredor A sale desde atrás a ${fast} m/s. ¿Cuánto tarda A en alcanzar a B?`,
+            formula:"Alcance: t = d₀/(v_A − v_B)",
+            choices:makeChoices(t,"s",[d0/(fast+slow), d0/fast, d0/slow, (fast-slow)/d0]),
+            hints:["En alcance no se suman velocidades: se resta la velocidad del que va adelante.","Usa velocidad relativa v_A − v_B.",`t = ${d0} m / (${fast} − ${slow}) m/s.`],
+            solution:[`Datos: d₀ = ${d0} m, v_A = ${fast} m/s, v_B = ${slow} m/s.`,`Velocidad relativa: vᵣ = v_A − v_B = ${fast-slow} m/s.`,`t = d₀/vᵣ = (${d0} m)/(${fast-slow} m/s) = ${fmt(t)} s.`,`Respuesta: ${fmt(t)} s.`],
+            correct:t, unit:"s"
+          });
+        }
+      },
+      {
+        id:"mruv_distance_rest", topic:"mruv", level:"basic",
+        create(){
+          const a = randInt(2,7), t = randInt(4,12), d = 0.5*a*t*t;
+          return problem({
+            topic:"mruv", level:"basic",
+            question:`Un carrito parte del reposo y acelera uniformemente a ${a} m/s² durante ${t} s. ¿Qué distancia recorre?`,
+            formula:"MRUV: Δx = v₀t + ½at²",
+            choices:makeChoices(d,"m",[a*t*t, a*t, 0.5*a*t, d+t]),
+            hints:["Parte del reposo, por tanto v₀ = 0.","La distancia queda Δx = ½at².",`Δx = 0.5(${a} m/s²)(${t} s)².`],
+            solution:[`Datos: v₀ = 0 m/s, a = ${a} m/s², t = ${t} s.`,`Ecuación: Δx = v₀t + ½at².`,`Sustitución: Δx = (0 m/s)(${t} s) + ½(${a} m/s²)(${t} s)² = ${fmt(d)} m.`,`Respuesta: ${fmt(d)} m.`],
+            correct:d, unit:"m"
+          });
+        }
+      },
+      {
+        id:"mruv_final_velocity", topic:"mruv", level:"basic",
+        create(){
+          const v0 = randInt(3,18), a = randInt(2,8), t = randInt(3,14), v = v0+a*t;
+          return problem({
+            topic:"mruv", level:"basic",
+            question:`Un móvil tiene velocidad inicial de ${v0} m/s y aceleración constante de ${a} m/s² durante ${t} s. ¿Cuál es su velocidad final?`,
+            formula:"MRUV: v = v₀ + at",
+            choices:makeChoices(v,"m/s",[v0+a, a*t, v0*t+a, Math.abs(v0-a*t)]),
+            hints:["La velocidad cambia linealmente con el tiempo.","Usa v = v₀ + at.",`v = ${v0} m/s + (${a} m/s²)(${t} s).`],
+            solution:[`Datos: v₀ = ${v0} m/s, a = ${a} m/s², t = ${t} s.`,`Ecuación: v = v₀ + at.`,`Sustitución: v = ${v0} m/s + (${a} m/s²)(${t} s) = ${fmt(v)} m/s.`,`Respuesta: ${fmt(v)} m/s.`],
+            correct:v, unit:"m/s"
+          });
+        }
+      },
+      {
+        id:"mruv_braking", topic:"mruv", level:"intermediate",
+        create(){
+          const v0 = randInt(18,36), a = -randInt(3,8), d = (0 - v0*v0)/(2*a);
+          return problem({
+            topic:"mruv", level:"intermediate",
+            question:`Un automóvil viaja a ${v0} m/s y frena con aceleración constante de ${a} m/s² hasta detenerse. ¿Qué distancia recorre durante el frenado?`,
+            formula:"MRUV: v² = v₀² + 2aΔx",
+            choices:makeChoices(d,"m",[v0/Math.abs(a), v0*v0/Math.abs(a), 2*Math.abs(a)*v0, Math.abs(a)*v0]),
+            hints:["Al detenerse, la velocidad final es v = 0.","Usa v² = v₀² + 2aΔx y despeja Δx.",`Δx = (0² − ${v0}²)/(2(${a})).`],
+            solution:[`Datos: v₀ = ${v0} m/s, v = 0 m/s, a = ${a} m/s².`,`Ecuación: v² = v₀² + 2aΔx.`,`Despeje: Δx = (v² − v₀²)/(2a).`,`Sustitución: Δx = [(0 m/s)² − (${v0} m/s)²]/[2(${a} m/s²)] = ${fmt(d)} m.`,`Respuesta: ${fmt(d)} m.`],
+            correct:d, unit:"m"
+          });
+        }
+      },
+      {
+        id:"mruv_accel_from_s", topic:"mruv", level:"intermediate",
+        create(){
+          const v0 = randInt(4,14), a = randInt(2,6), t = randInt(5,12), d = v0*t + 0.5*a*t*t;
+          return problem({
+            topic:"mruv", level:"intermediate",
+            question:`Un móvil avanza ${fmt(d)} m en ${t} s. Si su velocidad inicial era ${v0} m/s y la aceleración fue constante, ¿cuál fue su aceleración?`,
+            formula:"MRUV: a = 2(Δx − v₀t)/t²",
+            choices:makeChoices(a,"m/s²",[d/(t*t), 2*d/(t*t), (d-v0)/t, (d+v0*t)/(t*t)]),
+            hints:["Usa Δx = v₀t + ½at².","Primero resta v₀t a la distancia total.",`a = 2(${fmt(d)} − ${v0}·${t})/${t}².`],
+            solution:[`Datos: Δx = ${fmt(d)} m, v₀ = ${v0} m/s, t = ${t} s.`,`Ecuación: Δx = v₀t + ½at².`,`Despeje: a = 2(Δx − v₀t)/t².`,`Sustitución: a = 2[${fmt(d)} m − (${v0} m/s)(${t} s)]/(${t} s)² = ${fmt(a)} m/s².`,`Respuesta: ${fmt(a)} m/s².`],
+            correct:a, unit:"m/s²"
+          });
+        }
+      },
+      {
+        id:"freefall_time", topic:"freefall", level:"basic",
+        create(){
+          const t = randInt(2,7), h = 0.5*G*t*t;
+          return problem({
+            topic:"freefall", level:"basic",
+            question:`Se deja caer una piedra desde el reposo desde una altura de ${fmt(h)} m. Sin resistencia del aire, ¿cuánto tarda en llegar al suelo?`,
+            formula:"Caída libre: h = ½gt²",
+            choices:makeChoices(t,"s",[h/G, Math.sqrt(h/G), 2*h/G, t*2]),
+            hints:["Se deja caer: v₀ = 0.","Despeja t desde h = ½gt².",`t = √(2h/g), con h = ${fmt(h)} m.`],
+            solution:[`Datos: h = ${fmt(h)} m, g = 9.8 m/s².`,`Ecuación: h = ½gt².`,`Despeje: t = √(2h/g).`,`Sustitución: t = √[2(${fmt(h)} m)/(9.8 m/s²)] = ${fmt(t)} s.`,`Respuesta: ${fmt(t)} s.`],
+            correct:t, unit:"s"
+          });
+        }
+      },
+      {
+        id:"freefall_speed", topic:"freefall", level:"basic",
+        create(){
+          const t = randInt(2,8), v = G*t, h = 0.5*G*t*t;
+          return problem({
+            topic:"freefall", level:"basic",
+            question:`Una pelota se deja caer desde el reposo y cae durante ${t} s. ¿Cuál es su rapidez justo antes de completar ese tiempo?`,
+            formula:"Caída libre: v = gt",
+            choices:makeChoices(v,"m/s",[0.5*G*t, G*t*t, h/t, t/G]),
+            hints:["En caída libre desde el reposo, la rapidez aumenta por g cada segundo.","Usa v = gt.",`v = (9.8 m/s²)(${t} s).`],
+            solution:[`Datos: v₀ = 0 m/s, g = 9.8 m/s², t = ${t} s.`,`Ecuación: v = gt.`,`Sustitución: v = (9.8 m/s²)(${t} s) = ${fmt(v)} m/s.`,`Respuesta: ${fmt(v)} m/s.`],
+            correct:v, unit:"m/s"
+          });
+        }
+      },
+      {
+        id:"freefall_height_from_speed", topic:"freefall", level:"intermediate",
+        create(){
+          const v = randInt(18,42), h = v*v/(2*G);
+          return problem({
+            topic:"freefall", level:"intermediate",
+            question:`Un objeto se deja caer desde el reposo y llega al suelo con rapidez de ${v} m/s. ¿Desde qué altura cayó?`,
+            formula:"Caída libre: v² = 2gh",
+            choices:makeChoices(h,"m",[v/G, v*v/G, 2*G*v, v/(2*G)]),
+            hints:["Como parte del reposo, v₀ = 0.","Usa v² = 2gh.",`h = ${v}²/[2(9.8)].`],
+            solution:[`Datos: v = ${v} m/s, g = 9.8 m/s².`,`Ecuación: v² = 2gh.`,`Despeje: h = v²/(2g).`,`Sustitución: h = (${v} m/s)²/[2(9.8 m/s²)] = ${fmt(h)} m.`,`Respuesta: ${fmt(h)} m.`],
+            correct:h, unit:"m"
+          });
+        }
+      },
+      {
+        id:"vertical_max_height", topic:"vertical", level:"basic",
+        create(){
+          const v0 = randInt(18,42), h = v0*v0/(2*G);
+          return problem({
+            topic:"vertical", level:"basic",
+            question:`Una pelota se lanza verticalmente hacia arriba con velocidad inicial de ${v0} m/s. ¿Cuál es la altura máxima que alcanza respecto al punto de lanzamiento?`,
+            formula:"Tiro vertical: hₘáx = v₀²/(2g)",
+            choices:makeChoices(h,"m",[v0/G, v0*v0/G, 2*G*v0, v0/(2*G)]),
+            hints:["En la altura máxima la velocidad final es 0.","Usa v² = v₀² − 2gh.",`h = ${v0}²/[2(9.8)].`],
+            solution:[`Datos: v₀ = ${v0} m/s, v = 0 m/s, g = 9.8 m/s².`,`Ecuación: v² = v₀² − 2gh.`,`Despeje: h = v₀²/(2g).`,`Sustitución: h = (${v0} m/s)²/[2(9.8 m/s²)] = ${fmt(h)} m.`,`Respuesta: ${fmt(h)} m.`],
+            correct:h, unit:"m"
+          });
+        }
+      },
+      {
+        id:"vertical_time_up", topic:"vertical", level:"basic",
+        create(){
+          const v0 = randInt(16,44), t = v0/G;
+          return problem({
+            topic:"vertical", level:"basic",
+            question:`Una pelota se lanza verticalmente hacia arriba con velocidad inicial de ${v0} m/s. ¿Cuánto tarda en llegar a la altura máxima?`,
+            formula:"Tiro vertical: t_subida = v₀/g",
+            choices:makeChoices(t,"s",[2*v0/G, v0/(2*G), v0*G, G/v0]),
+            hints:["En el punto más alto, v = 0.","Usa v = v₀ − gt.",`0 = ${v0} − 9.8t.`],
+            solution:[`Datos: v₀ = ${v0} m/s, v = 0 m/s, g = 9.8 m/s².`,`Ecuación: v = v₀ − gt.`,`Despeje: t = v₀/g.`,`Sustitución: t = (${v0} m/s)/(9.8 m/s²) = ${fmt(t)} s.`,`Respuesta: ${fmt(t)} s.`],
+            correct:t, unit:"s"
+          });
+        }
+      },
+      {
+        id:"vertical_height_time", topic:"vertical", level:"intermediate",
+        create(){
+          const v0 = randInt(24,48), t = randInt(2,5), y = v0*t - 0.5*G*t*t;
+          return problem({
+            topic:"vertical", level:"intermediate",
+            question:`Una pelota se lanza verticalmente hacia arriba con velocidad inicial de ${v0} m/s. ¿Qué altura alcanza después de ${t} s respecto al punto de lanzamiento?`,
+            formula:"Tiro vertical: y = v₀t − ½gt²",
+            choices:makeChoices(y,"m",[v0*t + 0.5*G*t*t, 0.5*G*t*t, v0*t, y/2]),
+            hints:["Toma hacia arriba como positivo.","La gravedad resta altura: y = v₀t − ½gt².",`y = (${v0})(${t}) − 0.5(9.8)(${t})².`],
+            solution:[`Datos: v₀ = ${v0} m/s, g = 9.8 m/s², t = ${t} s.`,`Ecuación: y = v₀t − ½gt².`,`Sustitución: y = (${v0} m/s)(${t} s) − ½(9.8 m/s²)(${t} s)² = ${fmt(y)} m.`,`Respuesta: ${fmt(y)} m.`],
+            correct:y, unit:"m"
+          });
+        }
+      },
+      {
+        id:"vertical_platform", topic:"vertical", level:"advanced",
+        create(){
+          const h0 = randInt(20,80), v0 = randInt(10,26);
+          const t = (v0 + Math.sqrt(v0*v0 + 2*G*h0))/G;
+          return problem({
+            topic:"vertical", level:"advanced",
+            question:`Desde una plataforma de ${h0} m de altura se lanza una pelota verticalmente hacia arriba con velocidad inicial de ${v0} m/s. ¿Cuánto tarda en llegar al suelo?`,
+            formula:"y = h₀ + v₀t − ½gt²; suelo: y = 0",
+            choices:makeChoices(t,"s",[v0/G, Math.sqrt(2*h0/G), (Math.sqrt(v0*v0+2*G*h0)-v0)/G, 2*v0/G]),
+            hints:["El origen puede colocarse en el suelo; la altura inicial es h₀.","Plantea 0 = h₀ + v₀t − ½gt².","Usa la raíz positiva de la ecuación cuadrática."],
+            solution:[`Datos: h₀ = ${h0} m, v₀ = ${v0} m/s, g = 9.8 m/s².`,`Ecuación de posición: y = h₀ + v₀t − ½gt².`,`Al llegar al suelo: 0 = ${h0} m + (${v0} m/s)t − ½(9.8 m/s²)t².`,`Forma equivalente: 4.9t² − ${v0}t − ${h0} = 0.`,`Raíz positiva: t = [${v0} + √(${v0}² + 2(9.8)(${h0}))]/9.8 = ${fmt(t)} s.`,`Respuesta: ${fmt(t)} s.`],
+            correct:t, unit:"s"
+          });
+        }
+      },
+      {
+        id:"graph_xt_mru", topic:"graphs", level:"intermediate",
+        create(){
+          const x0 = randInt(5,30), v = randInt(3,12), t1=0, t2=randInt(6,14), x2=x0+v*t2;
+          return problem({
+            topic:"graphs", level:"intermediate",
+            question:`La gráfica posición-tiempo representa un MRU. ¿Cuál es la velocidad del móvil?`,
+            formula:"En x-t, la pendiente representa velocidad: v = Δx/Δt",
+            graph:{ title:"Gráfica x-t", xLabel:"t (s)", yLabel:"x (m)", points:[{x:t1,y:x0},{x:t2,y:x2}] },
+            choices:makeChoices(v,"m/s",[x2/t2, x0/t2, (x2+x0)/t2, t2/(x2-x0)]),
+            hints:["En una gráfica x-t, la velocidad es la pendiente.","Usa v = (x₂ − x₁)/(t₂ − t₁).",`v = (${x2} − ${x0})/(${t2} − 0).`],
+            solution:[`Datos de la gráfica: punto 1 = (0 s, ${x0} m), punto 2 = (${t2} s, ${x2} m).`,`Pendiente: v = Δx/Δt.`,`Sustitución: v = (${x2} m − ${x0} m)/(${t2} s − 0 s) = ${fmt(v)} m/s.`,`Respuesta: ${fmt(v)} m/s.`],
+            correct:v, unit:"m/s"
+          });
+        }
+      },
+      {
+        id:"graph_vt_area", topic:"graphs", level:"intermediate",
+        create(){
+          const v0 = randInt(4,14), a = randInt(2,6), t = randInt(5,12), v1=v0+a*t, d=((v0+v1)/2)*t;
+          return problem({
+            topic:"graphs", level:"intermediate",
+            question:`La gráfica velocidad-tiempo muestra un movimiento con aceleración constante. ¿Cuál es el desplazamiento entre 0 s y ${t} s?`,
+            formula:"En v-t, el área bajo la gráfica representa desplazamiento",
+            graph:{ title:"Gráfica v-t", xLabel:"t (s)", yLabel:"v (m/s)", area:true, points:[{x:0,y:v0},{x:t,y:v1}] },
+            choices:makeChoices(d,"m",[v1*t, 0.5*a*t*t, v0*t, (v1-v0)/t]),
+            hints:["En v-t no uses pendiente para desplazamiento; usa área.","El área es un trapecio: A = [(v₀ + v₁)/2]t.",`A = [(${v0} + ${v1})/2](${t}).`],
+            solution:[`Datos de la gráfica: v₀ = ${v0} m/s, v₁ = ${v1} m/s, t = ${t} s.`,`Desplazamiento = área bajo la curva v-t.`,`Área del trapecio: Δx = [(v₀ + v₁)/2]t.`,`Sustitución: Δx = [(${v0} m/s + ${v1} m/s)/2](${t} s) = ${fmt(d)} m.`,`Respuesta: ${fmt(d)} m.`],
+            correct:d, unit:"m"
+          });
+        }
+      },
+      {
+        id:"graph_vt_accel", topic:"graphs", level:"basic",
+        create(){
+          const v0 = randInt(2,12), a = randInt(2,7), t = randInt(4,10), v1 = v0+a*t;
+          return problem({
+            topic:"graphs", level:"basic",
+            question:`En la gráfica velocidad-tiempo, ¿cuál es la aceleración del móvil?`,
+            formula:"En v-t, la pendiente representa aceleración: a = Δv/Δt",
+            graph:{ title:"Gráfica v-t", xLabel:"t (s)", yLabel:"v (m/s)", points:[{x:0,y:v0},{x:t,y:v1}] },
+            choices:makeChoices(a,"m/s²",[v1/t, v0/t, (v1+v0)/t, t/(v1-v0)]),
+            hints:["En una gráfica v-t, la aceleración es la pendiente.","Usa a = (v₂ − v₁)/(t₂ − t₁).",`a = (${v1} − ${v0})/${t}.`],
+            solution:[`Datos de la gráfica: v₀ = ${v0} m/s, v₁ = ${v1} m/s, Δt = ${t} s.`,`Pendiente: a = Δv/Δt.`,`Sustitución: a = (${v1} m/s − ${v0} m/s)/(${t} s) = ${fmt(a)} m/s².`,`Respuesta: ${fmt(a)} m/s².`],
+            correct:a, unit:"m/s²"
+          });
+        }
+      },
+      {
+        id:"graph_freefall_vt", topic:"graphs", level:"advanced",
+        create(){
+          const t = randInt(3,7), v = -G*t, d = -0.5*G*t*t;
+          return problem({
+            topic:"graphs", level:"advanced",
+            question:`La gráfica v-t corresponde a una caída libre tomando hacia arriba como positivo. ¿Cuál es el desplazamiento vertical entre 0 s y ${t} s?`,
+            formula:"En v-t, el área con signo representa desplazamiento",
+            graph:{ title:"Caída libre: v-t", xLabel:"t (s)", yLabel:"v (m/s)", area:true, points:[{x:0,y:0},{x:t,y:v}] },
+            choices:makeChoices(d,"m",[Math.abs(d), v*t, -G*t, 0.5*G*t]),
+            hints:["El área está debajo del eje t, por eso el desplazamiento es negativo.","El área triangular es ½(base)(altura), con signo negativo.",`Δy = −½(9.8)(${t})².`],
+            solution:[`Datos: t = ${t} s, g = 9.8 m/s², v_f = −${fmt(Math.abs(v))} m/s.`,`El desplazamiento es el área con signo bajo la gráfica v-t.`,`Área triangular: Δy = −½gt².`,`Sustitución: Δy = −½(9.8 m/s²)(${t} s)² = ${fmt(d)} m.`,`Respuesta: ${fmt(d)} m.`],
+            correct:d, unit:"m"
+          });
+        }
+      }
+    ];
+
+    function problem(obj){ return {...obj, id: cryptoSafeId(), studentChoice:null, answered:false, correctChoice:null}; }
+    function cryptoSafeId(){ return Math.random().toString(36).slice(2) + Date.now().toString(36); }
+
+    function generateProblems(){
+      const amount = Number(document.getElementById("numProblems").value);
+      const difficulty = document.getElementById("difficulty").value;
+      const selectedTopics = [...document.querySelectorAll(".topic:checked")].map(x=>x.value);
+      if(selectedTopics.length===0){ alert("Selecciona al menos un tema."); return []; }
+
+      let pool = templates.filter(t=>selectedTopics.includes(t.topic));
+      if(difficulty !== "mixed"){
+        const allowed = difficulty === "basic" ? ["basic"] : difficulty === "intermediate" ? ["basic","intermediate"] : ["intermediate","advanced"];
+        pool = pool.filter(t=>allowed.includes(t.level));
+      }
+      if(pool.length===0) pool = templates.filter(t=>selectedTopics.includes(t.topic));
+
+      const problems=[];
+      let guard=0;
+      while(problems.length<amount && guard<amount*12){
+        guard++;
+        const t = pick(pool);
+        const p = t.create();
+        problems.push(p);
+      }
+      return problems;
+    }
+
+    function startQuiz(){
+      const seedValue = document.getElementById("seedInput").value.trim();
+      setSeed(seedValue);
+      if(!seedValue) document.getElementById("seedInput").value = app.seed;
+      app.problems = generateProblems();
+      if(app.problems.length===0) return;
+      app.index = 0;
+      app.answers = [];
+      app.startedAt = new Date();
+      app.mode = document.getElementById("mode").value;
+      app.hintShown = 0;
+      app.checked = false;
+      app.selected = null;
+      renderProblem();
+      saveState();
+    }
+
+    function renderProblem(){
+      const p = app.problems[app.index];
+      app.hintShown = 0;
+      app.checked = false;
+      app.selected = p.studentChoice;
+      const answeredCount = app.answers.length;
+      const pct = (app.index/app.problems.length)*100;
+      const score = app.answers.filter(a=>a.correct).length;
+      const quiz = document.getElementById("quizArea");
+      quiz.innerHTML = `
+        <div class="topbar">
+          <div class="progress-wrap">
+            <div class="progress-label"><span>Problema ${app.index+1} de ${app.problems.length}</span><span>${Math.round(pct)}%</span></div>
+            <div class="progress"><span style="width:${pct}%"></span></div>
+          </div>
+          <div class="scorebox">
+            <span class="score-chip">Correctas: ${score}</span>
+            <span class="score-chip">Semilla: ${app.seed}</span>
+          </div>
+        </div>
+        <div class="problem-meta">
+          <span class="tag tag-topic">${topicNames[p.topic]}</span>
+          <span class="tag tag-level">${levelNames[p.level]}</span>
+          <span class="tag tag-mode">${app.mode === "practice" ? "Práctica" : "Evaluación"}</span>
+        </div>
+        <div class="question">${p.question}</div>
+        ${renderGraph(p.graph)}
+        <div class="formula-card"><span class="math">Fórmula clave:</span> ${p.formula}</div>
+        <div class="choices" id="choices">
+          ${p.choices.map((c,i)=>`<div class="choice ${p.studentChoice===i?'selected':''}" data-i="${i}"><div class="choice-letter">${String.fromCharCode(65+i)}</div><div class="choice-text">${c.text}</div></div>`).join("")}
+        </div>
+        <div class="feedback" id="feedback"></div>
+        <div class="btn-row">
+          <button class="btn-secondary" id="checkBtn">Comprobar</button>
+          <button class="btn-soft" id="hintBtn">Ver pista 1</button>
+          <button class="btn-ghost" id="solutionBtn">Ver solución completa</button>
+          <button class="btn-yellow" id="nextBtn">${app.index === app.problems.length-1 ? "Finalizar" : "Siguiente"}</button>
+        </div>
+        <div class="hint-box" id="hintBox"></div>
+        <div class="solution-box" id="solutionBox"></div>
+      `;
+
+      document.querySelectorAll(".choice").forEach(el=>{
+        el.addEventListener("click",()=>selectChoice(Number(el.dataset.i)));
+      });
+      document.getElementById("checkBtn").addEventListener("click",checkAnswer);
+      document.getElementById("hintBtn").addEventListener("click",showHint);
+      document.getElementById("solutionBtn").addEventListener("click",showSolution);
+      document.getElementById("nextBtn").addEventListener("click",nextProblem);
+
+      if(app.mode === "exam"){
+        document.getElementById("solutionBtn").disabled = true;
+        document.getElementById("solutionBtn").textContent = "Solución al finalizar";
+      }
+      if(p.answered) revealCheckedState();
+    }
+
+    function selectChoice(i){
+      if(app.checked) return;
+      app.selected = i;
+      const p = app.problems[app.index];
+      p.studentChoice = i;
+      document.querySelectorAll(".choice").forEach(el=>el.classList.remove("selected"));
+      document.querySelector(`.choice[data-i="${i}"]`).classList.add("selected");
+      saveState();
+    }
+
+    function checkAnswer(){
+      const p = app.problems[app.index];
+      if(app.selected===null || app.selected===undefined){ alert("Selecciona una opción antes de comprobar."); return; }
+      const isCorrect = !!p.choices[app.selected].correct;
+      p.answered = true;
+      p.studentChoice = app.selected;
+      app.checked = true;
+      const existing = app.answers.find(a=>a.index===app.index);
+      const record = { index:app.index, correct:isCorrect, choice:app.selected, time:new Date().toISOString() };
+      if(existing) Object.assign(existing,record); else app.answers.push(record);
+      revealCheckedState();
+      saveState();
+    }
+
+    function revealCheckedState(){
+      const p = app.problems[app.index];
+      const fb = document.getElementById("feedback");
+      document.querySelectorAll(".choice").forEach((el,i)=>{
+        el.classList.remove("selected");
+        if(p.choices[i].correct) el.classList.add("correct");
+        if(p.studentChoice===i && !p.choices[i].correct) el.classList.add("wrong");
+      });
+      const isCorrect = p.choices[p.studentChoice]?.correct;
+      fb.className = "feedback " + (isCorrect ? "ok" : "bad");
+      fb.textContent = isCorrect ? "Correcto. Buen trabajo." : "Incorrecto. Revisa la fórmula, las unidades y el signo antes de pasar al siguiente.";
+      if(app.mode === "practice") showSolution(false);
+    }
+
+    function showHint(){
+      const p = app.problems[app.index];
+      const box = document.getElementById("hintBox");
+      app.hintShown = Math.min(app.hintShown+1, p.hints.length);
+      box.style.display="block";
+      box.innerHTML = `<h3>Pistas</h3><ol>${p.hints.slice(0,app.hintShown).map(h=>`<li>${h}</li>`).join("")}</ol>`;
+      const btn = document.getElementById("hintBtn");
+      if(app.hintShown < p.hints.length) btn.textContent = `Ver pista ${app.hintShown+1}`;
+      else { btn.textContent = "No hay más pistas"; btn.disabled = true; }
+    }
+
+    function showSolution(scroll=true){
+      if(app.mode === "exam" && app.index < app.problems.length){ return; }
+      const p = app.problems[app.index];
+      const box = document.getElementById("solutionBox");
+      box.style.display="block";
+      box.innerHTML = `<h3>Solución completa</h3><ol>${p.solution.map(s=>`<li>${s}</li>`).join("")}</ol>`;
+      if(scroll) box.scrollIntoView({behavior:"smooth", block:"nearest"});
+    }
+
+    function nextProblem(){
+      const p = app.problems[app.index];
+      if(!p.answered){
+        const proceed = confirm("Este problema aún no está comprobado. ¿Deseas avanzar sin responder?");
+        if(!proceed) return;
+        app.answers.push({index:app.index, correct:false, choice:null, skipped:true, time:new Date().toISOString()});
+        p.answered = true;
+      }
+      if(app.index < app.problems.length-1){ app.index++; renderProblem(); }
+      else renderResults();
+      saveState();
+    }
+
+    function renderResults(){
+      const total = app.problems.length;
+      const correct = app.answers.filter(a=>a.correct).length;
+      const pct = total ? (correct/total)*100 : 0;
+      const grade = round2(pct);
+      const elapsedMs = new Date() - app.startedAt;
+      const minutes = Math.floor(elapsedMs/60000);
+      const seconds = Math.floor((elapsedMs%60000)/1000);
+      const student = document.getElementById("studentName").value.trim() || "Sin nombre";
+      const section = document.getElementById("studentSection").value.trim() || "Sin sección";
+      const evidence = makeEvidenceCode(student, section, correct, total, app.seed);
+      saveAttempt({student,section,correct,total,grade,evidence,seed:app.seed,date:new Date().toISOString()});
+      const topicSummary = summarizeTopics();
+      const quiz = document.getElementById("quizArea");
+      quiz.innerHTML = `
+        <h2>Resultado final</h2>
+        <div class="result-grid">
+          <div class="result-card"><div class="big">${correct}/${total}</div><div class="small">Respuestas correctas</div></div>
+          <div class="result-card"><div class="big">${fmt(grade)}%</div><div class="small">Nota obtenida</div></div>
+          <div class="result-card"><div class="big">${minutes}:${String(seconds).padStart(2,"0")}</div><div class="small">Tiempo usado</div></div>
+        </div>
+        <div class="formula-card"><strong>Código de evidencia:</strong> ${evidence}<br><span class="hint-note">Este código ayuda a identificar el intento del estudiante, pero no sustituye la revisión docente.</span></div>
+        <h2>Reporte para Teams</h2>
+        <textarea id="reportText" rows="8">${makeReportText(student,section,correct,total,grade,evidence,minutes,seconds,topicSummary)}</textarea>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="copyReport()">Copiar reporte</button>
+          <button class="btn-soft" onclick="downloadCSV()">Descargar CSV</button>
+          <button class="btn-ghost" onclick="window.print()">Imprimir / guardar PDF</button>
+          <button class="btn-yellow" onclick="startQuiz()">Nuevo intento</button>
+        </div>
+        <h2 style="margin-top:24px">Revisión por problema</h2>
+        <div class="review-list">
+          ${app.problems.map((p,i)=>{
+            const ans = app.answers.find(a=>a.index===i);
+            const ok = ans?.correct;
+            const chosen = ans?.choice===null || ans?.choice===undefined ? "Sin responder" : p.choices[ans.choice].text;
+            const correctText = p.choices.find(c=>c.correct)?.text || "—";
+            return `<div class="review-item"><strong>${i+1}. ${topicNames[p.topic]} · ${levelNames[p.level]}</strong><br>${ok?'<span class="mini-ok">Correcto</span>':'<span class="mini-bad">Incorrecto</span>'}<br><span>Respuesta marcada: ${chosen}</span><br><span>Respuesta correcta: ${correctText}</span><details><summary>Ver solución</summary><ol>${p.solution.map(s=>`<li>${s}</li>`).join("")}</ol></details></div>`
+          }).join("")}
+        </div>
+      `;
+      localStorage.removeItem("cinematicaQuizState");
+    }
+
+    function summarizeTopics(){
+      const map = {};
+      app.problems.forEach((p,i)=>{
+        const ans = app.answers.find(a=>a.index===i);
+        if(!map[p.topic]) map[p.topic]={total:0,correct:0};
+        map[p.topic].total++;
+        if(ans?.correct) map[p.topic].correct++;
+      });
+      return Object.entries(map).map(([k,v])=>`${topicNames[k]}: ${v.correct}/${v.total}`).join("; ");
+    }
+
+    function makeEvidenceCode(student,section,correct,total,seed){
+      const raw = `${student}|${section}|${correct}|${total}|${seed}|${new Date().toDateString()}`;
+      let h=0;
+      for(let i=0;i<raw.length;i++) h = Math.imul(31,h) + raw.charCodeAt(i) | 0;
+      return `CIN-${Math.abs(h).toString(36).toUpperCase()}-${correct}${total}`;
+    }
+
+    function makeReportText(student,section,correct,total,grade,evidence,minutes,seconds,topicSummary){
+      return `REPORTE DE PRÁCTICA - CINEMÁTICA\nEstudiante: ${student}\nGrado/sección: ${section}\nFecha: ${new Date().toLocaleString("es-GT")}\nSemilla del test: ${app.seed}\nModo: ${app.mode === "practice" ? "Práctica" : "Evaluación"}\nResultado: ${correct}/${total}\nNota: ${fmt(grade)}%\nTiempo: ${minutes} min ${seconds} s\nDesempeño por tema: ${topicSummary}\nCódigo de evidencia: ${evidence}\n\nInstrucción para entrega: pegar este reporte en Teams y adjuntar captura de la pantalla de resultado.`;
+    }
+
+    async function copyReport(){
+      const txt = document.getElementById("reportText").value;
+      try{ await navigator.clipboard.writeText(txt); alert("Reporte copiado."); }
+      catch(e){ alert("No se pudo copiar automáticamente. Selecciona el texto y cópialo manualmente."); }
+    }
+
+    function downloadCSV(){
+      const rows = [["problema","tema","nivel","correcta","respuesta_marcada","respuesta_correcta"]];
+      app.problems.forEach((p,i)=>{
+        const ans = app.answers.find(a=>a.index===i);
+        rows.push([i+1, topicNames[p.topic], levelNames[p.level], ans?.correct?"sí":"no", ans?.choice==null?"":p.choices[ans.choice].text, p.choices.find(c=>c.correct)?.text || ""]);
+      });
+      const csv = rows.map(r=>r.map(cell=>`"${String(cell).replaceAll('"','""')}"`).join(",")).join("\n");
+      const blob = new Blob([csv],{type:"text/csv;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href=url; a.download="reporte_cinematica.csv"; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function saveAttempt(attempt){
+      const key="cinematicaAttempts";
+      const arr = JSON.parse(localStorage.getItem(key)||"[]");
+      arr.unshift(attempt);
+      localStorage.setItem(key,JSON.stringify(arr.slice(0,10)));
+    }
+
+    function saveState(){
+      if(!app.problems.length) return;
+      const state={
+        seed:app.seed, index:app.index, problems:app.problems, answers:app.answers, startedAt:app.startedAt, mode:app.mode,
+        settings:getSettings()
+      };
+      localStorage.setItem("cinematicaQuizState",JSON.stringify(state));
+    }
+
+    function getSettings(){
+      return {
+        name:document.getElementById("studentName").value,
+        section:document.getElementById("studentSection").value,
+        amount:document.getElementById("numProblems").value,
+        difficulty:document.getElementById("difficulty").value,
+        mode:document.getElementById("mode").value,
+        seed:document.getElementById("seedInput").value,
+        topics:[...document.querySelectorAll(".topic:checked")].map(x=>x.value)
+      };
+    }
+
+    function applySettings(s){
+      if(!s) return;
+      document.getElementById("studentName").value=s.name||"";
+      document.getElementById("studentSection").value=s.section||"";
+      document.getElementById("numProblems").value=s.amount||"10";
+      document.getElementById("difficulty").value=s.difficulty||"intermediate";
+      document.getElementById("mode").value=s.mode||"practice";
+      document.getElementById("seedInput").value=s.seed||"";
+      if(s.topics){ document.querySelectorAll(".topic").forEach(x=>x.checked=s.topics.includes(x.value)); }
+    }
+
+    function resetAll(){
+      if(confirm("¿Deseas borrar el intento actual y reiniciar?")){
+        localStorage.removeItem("cinematicaQuizState");
+        app.problems=[]; app.answers=[]; app.index=0;
+        document.getElementById("quizArea").innerHTML = `<div class="empty-state"><div class="empty-icon">Σ</div><h2>Listo para practicar cinemática</h2><p>Configura el test y genera un nuevo intento.</p><button class="btn-primary" onclick="startQuiz()">Comenzar ahora</button></div>`;
+      }
+    }
+
+    function buildConfiguredURL(){
+      const s = getSettings();
+      const params = new URLSearchParams();
+      params.set("n",s.amount); params.set("nivel",s.difficulty); params.set("modo",s.mode); params.set("temas",s.topics.join("."));
+      if(s.seed) params.set("semilla",s.seed);
+      return `${location.origin}${location.pathname}?${params.toString()}`;
+    }
+
+    async function copyConfiguredURL(){
+      const url = buildConfiguredURL();
+      try{ await navigator.clipboard.writeText(url); document.getElementById("shareStatus").textContent="Enlace configurado copiado."; }
+      catch(e){ document.getElementById("shareStatus").textContent=url; }
+    }
+
+    function applyQueryParams(){
+      const q = new URLSearchParams(location.search);
+      if(q.has("n")) document.getElementById("numProblems").value=q.get("n");
+      if(q.has("nivel")) document.getElementById("difficulty").value=q.get("nivel");
+      if(q.has("modo")) document.getElementById("mode").value=q.get("modo");
+      if(q.has("semilla")) document.getElementById("seedInput").value=q.get("semilla");
+      if(q.has("temas")){
+        const topics=q.get("temas").split(".");
+        document.querySelectorAll(".topic").forEach(x=>x.checked=topics.includes(x.value));
+      }
+    }
+
+    function renderCalculator(){
+      const panel = document.getElementById("calcPanel");
+      if(app.calcTab==="mruCalc"){
+        panel.innerHTML = `<p class="small-title">MRU: d = vt</p><div class="calc-grid"><div><label>v (m/s)</label><input id="c_v" type="number" value="12"></div><div><label>t (s)</label><input id="c_t" type="number" value="8"></div><div><label>d (m)</label><input id="c_d" type="number" placeholder="opcional"></div><div><label>Calcular</label><button class="btn-secondary" onclick="calcMRU()">Calcular faltantes</button></div></div><div id="calcOut" class="calc-output">Ingresa dos datos para calcular el tercero.</div>`;
+      }
+      if(app.calcTab==="mruvCalc"){
+        panel.innerHTML = `<p class="small-title">MRUV: v = v₀ + at; Δx = v₀t + ½at²</p><div class="calc-grid"><div><label>v₀ (m/s)</label><input id="c_v0" type="number" value="5"></div><div><label>a (m/s²)</label><input id="c_a" type="number" value="2"></div><div><label>t (s)</label><input id="c_t2" type="number" value="6"></div><div><label>Calcular</label><button class="btn-secondary" onclick="calcMRUV()">Calcular v y Δx</button></div></div><div id="calcOut" class="calc-output">Calcula velocidad final y desplazamiento.</div>`;
+      }
+      if(app.calcTab==="fallCalc"){
+        panel.innerHTML = `<p class="small-title">Caída libre desde reposo: h = ½gt²; v = gt</p><div class="calc-grid"><div><label>t (s)</label><input id="c_tf" type="number" value="3"></div><div><label>g (m/s²)</label><input id="c_gf" type="number" value="9.8"></div><div><label>Calcular</label><button class="btn-secondary" onclick="calcFall()">Calcular h y v</button></div></div><div id="calcOut" class="calc-output">Calcula altura recorrida y velocidad.</div>`;
+      }
+      if(app.calcTab==="verticalCalc"){
+        panel.innerHTML = `<p class="small-title">Tiro vertical: y = v₀t − ½gt²; v = v₀ − gt</p><div class="calc-grid"><div><label>v₀ (m/s)</label><input id="c_v0v" type="number" value="28"></div><div><label>t (s)</label><input id="c_tv" type="number" value="2"></div><div><label>g (m/s²)</label><input id="c_gv" type="number" value="9.8"></div><div><label>Calcular</label><button class="btn-secondary" onclick="calcVertical()">Calcular y y v</button></div></div><div id="calcOut" class="calc-output">Calcula altura y velocidad en un instante.</div>`;
+      }
+    }
+
+    function calcMRU(){
+      const v = parseFloat(document.getElementById("c_v").value), t = parseFloat(document.getElementById("c_t").value), d = parseFloat(document.getElementById("c_d").value);
+      let out=[];
+      if(Number.isFinite(v)&&Number.isFinite(t)) out.push(`d = vt = (${fmt(v)} m/s)(${fmt(t)} s) = ${fmt(v*t)} m`);
+      if(Number.isFinite(d)&&Number.isFinite(v)&&v!==0) out.push(`t = d/v = ${fmt(d/v)} s`);
+      if(Number.isFinite(d)&&Number.isFinite(t)&&t!==0) out.push(`v = d/t = ${fmt(d/t)} m/s`);
+      document.getElementById("calcOut").innerHTML = out.join("<br>") || "Ingresa datos válidos.";
+    }
+    function calcMRUV(){
+      const v0=parseFloat(document.getElementById("c_v0").value), a=parseFloat(document.getElementById("c_a").value), t=parseFloat(document.getElementById("c_t2").value);
+      const v=v0+a*t, x=v0*t+0.5*a*t*t;
+      document.getElementById("calcOut").innerHTML = `v = v₀ + at = ${fmt(v)} m/s<br>Δx = v₀t + ½at² = ${fmt(x)} m`;
+    }
+    function calcFall(){
+      const t=parseFloat(document.getElementById("c_tf").value), g=parseFloat(document.getElementById("c_gf").value);
+      const h=0.5*g*t*t, v=g*t;
+      document.getElementById("calcOut").innerHTML = `h = ½gt² = ${fmt(h)} m<br>v = gt = ${fmt(v)} m/s`;
+    }
+    function calcVertical(){
+      const v0=parseFloat(document.getElementById("c_v0v").value), t=parseFloat(document.getElementById("c_tv").value), g=parseFloat(document.getElementById("c_gv").value);
+      const y=v0*t-0.5*g*t*t, v=v0-g*t;
+      document.getElementById("calcOut").innerHTML = `y = v₀t − ½gt² = ${fmt(y)} m<br>v = v₀ − gt = ${fmt(v)} m/s`;
+    }
+
+    document.getElementById("startBtn").addEventListener("click",startQuiz);
+    document.getElementById("resetBtn").addEventListener("click",resetAll);
+    document.getElementById("shareBtn").addEventListener("click",copyConfiguredURL);
+    document.querySelectorAll(".tab").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        app.calcTab=btn.dataset.tab;
+        renderCalculator();
+      });
+    });
+
+    applyQueryParams();
+    renderCalculator();
+  </script>
+</body>
+</html>
